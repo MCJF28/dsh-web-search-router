@@ -1,0 +1,45 @@
+{
+  "name": "dsh-web-search-router",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "搜索路由：按用户选择与模型渠道决定使用官方 DeepSeek 搜索还是自定义搜索；两者都不可用时给出明确提示。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "web-search",
+    "router"
+  ],
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MCJF28/dsh-web-search-router.git"
+  },
+  "homepage": "https://github.com/MCJF28/dsh-web-search-router",
+  "bugs": {
+    "url": "https://github.com/MCJF28/dsh-web-search-router/issues"
+  },
+  "author": "MCJF28"
+}

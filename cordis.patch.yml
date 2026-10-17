@@ -1,0 +1,4 @@
+# dsh-web-search-router —— bundle patch
+- insert:
+    - id: dsh-web-search-router
+      name: dsh-web-search-router
