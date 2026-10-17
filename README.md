@@ -1,47 +1,49 @@
 # dsh-web-search-router
 
-搜索路由插件：按「用的是哪个模型通道」决定走官方搜索还是你自己的搜索服务，并且在两者都不可用时给出可读的原因，而不是一句 500。
+English | [中文](./README.zh.md)
 
-## 为什么需要
+Channel-aware search routing for DeepSeek Harness: which provider a search uses depends on which model route is active, and when neither side is usable you get a readable reason instead of a bare 500.
 
-DSH 自带的搜索只对官方 DeepSeek 账号通道生效。用第三方模型通道时搜索会静默失败，用户看到的只是一个模糊的错误。这个插件把两种情况都接上：
+## Why it exists
 
-| 当前通道 | 走哪条路 |
+The built-in search only works on the official DeepSeek account route. On a third-party model route it fails silently, leaving the user with a vague error. This plugin wires up both sides:
+
+| Active route | What gets used |
 |---|---|
-| 官方 DeepSeek 账号 | Anthropic Messages 协议里的 `web_search` 工具 |
-| 第三方通道 | 你自己配置的搜索服务（Parallel 兼容接口） |
+| Official DeepSeek account | The `web_search` tool over the Anthropic Messages protocol |
+| Third-party route | Your own search endpoint (Parallel-compatible API) |
 
-## 配置
+## Configuration
 
-设置 → 搜索，填搜索服务的 API Key 与接口地址。
+Settings → Search, then fill in the API key and endpoint of your search service.
 
-凭据按以下顺序解析，前一个取不到就用下一个：
+Credentials resolve in this order; the first one that exists wins:
 
-1. 账号令牌
-2. 凭据存储里的 `DEEPSEEK_API_KEY`
-3. 启动环境变量
+1. Account token
+2. `DEEPSEEK_API_KEY` in the credential store
+3. Launch environment variable
 
-## 失败提示
+## Failure reporting
 
-搜索失败时右下角弹提示，说明具体是哪一步不行：
+When a search fails, a notice appears in the bottom-right corner and names the step that failed:
 
-- 没配 Key → 「还没有可用的搜索服务。请到「设置 → 搜索」填写 API Key。」
-- 请求被拒 → 带上游返回的状态与原因
-- 超时 / 网络错误 → 单独区分，不混为一谈
+- No key configured → "No search service is available yet. Set an API key in Settings → Search."
+- Upstream refused → status and reason from the upstream response
+- Timeout / network error → reported separately, never lumped together
 
-提示 12 秒自动消失，也可以手动确认。
+Notices disappear after 12 seconds, and can also be dismissed manually.
 
-## 安装
+## Install
 
 ```bash
 pnpm add github:MCJF28/dsh-web-search-router
 ```
 
-装完在 `dsh.profile.bundles` 里加上 `dsh-web-search-router`。
+Then add `dsh-web-search-router` to `dsh.profile.bundles`.
 
-## 注意
+## Notes
 
-如果你的 profile patch 里 `web` 这一行被 base 包写死了 `searchProvider: deepseek-official`，需要在 profile 的 `cordis.patch.yml` 里覆盖它，否则这个插件注册的 provider 不会被选中：
+If your profile patch has the `web` row hard-coded to `searchProvider: deepseek-official` by the base bundle, override it in the profile's `cordis.patch.yml` — otherwise the provider this plugin registers is never selected:
 
 ```yaml
 - id: web
@@ -51,4 +53,4 @@ pnpm add github:MCJF28/dsh-web-search-router
     fetchProvider: http
 ```
 
-原因：`resolveProvider` 只在 `configuredId === undefined` 时才遍历 provider 列表找可用项。一旦配置里写死了名字，插件的 `available()` 根本不会被调用。
+Why: `resolveProvider` only walks the provider list looking for an available one while `configuredId === undefined`. Once a name is hard-coded in configuration, the plugin's `available()` is never even called.
