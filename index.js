@@ -28,7 +28,7 @@ import { WebError } from '@deepseek-ai/dsh-web'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 
 export const name = 'web-search-router'
-export const inject = ['web', 'webServer']
+export const inject = ['web', 'webServer', 'commands']
 
 const DSH_HOME = process.env.DSH_HOME || join(homedir(), '.dsh')
 const CONFIG_FILE = join(DSH_HOME, 'web-search.json')
@@ -389,6 +389,47 @@ async function searchCustom(request, signal) {
 }
 
 export function apply(ctx) {
+  /**
+   * `/search`：报告当前搜索会走哪条路。
+   *
+   * 命令里不能复用 isOfficialChannel()：它内部靠 agents.currentInitiator()，
+   * 在命令上下文里未必取得到。handler 的 invocation.agent 是明确的，
+   * 直接问它要 requestContext().provider 更可靠。
+   */
+  ctx.commands.register({
+    name: 'search',
+    description: '查看当前搜索路由状态',
+    handler: (inv) => {
+      let provider
+      try {
+        provider = inv.agent?.session?.requestContext?.()?.provider
+      } catch {
+        /* 取不到就按未知处理 */
+      }
+      const official = provider === OFFICIAL_CHANNEL
+      const wantOfficial = config.mode === 'official'
+        || (config.mode === 'auto' && official)
+      const customReady = hasCustom()
+      const modeLabel = { auto: '自动（跟随通道）', official: '强制官方', custom: '强制自定义' }[config.mode]
+        ?? config.mode
+
+      const lines = [
+        `模式：${modeLabel}`,
+        `当前通道：${provider === undefined ? '未知' : official ? 'DeepSeek 官方账号' : provider}`,
+        `实际走：${wantOfficial ? '官方搜索（Anthropic Messages 协议）' : '自定义搜索服务'}`,
+      ]
+
+      if (!wantOfficial && !customReady) {
+        lines.push('自定义搜索还没配好：需要 API Key 和合法的接口地址，否则搜索会直接报错。')
+      }
+      if (lastFailure !== null) {
+        lines.push(`上次失败：${lastFailure.message}`)
+      }
+      lines.push('在「设置 → 搜索」里调整。')
+      return { kind: 'success', text: lines.join('\n') }
+    },
+  })
+
   /**
    * 注册唯一入口 provider：
    *   · 官方渠道 → 内部走 DeepSeek 官方协议（凭据运行时从用户自己配置解析）；
