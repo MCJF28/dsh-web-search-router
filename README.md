@@ -37,19 +37,19 @@ DSH 自带的搜索只对官方 DeepSeek 账号通道生效。用第三方模型
 
 ## 安装
 
-**推荐用 DSH 内置插件安装程序。** 打开「设置 → 内置插件」，在安装输入框里粘贴下面这一串（就是 `pnpm add` 后面的地址），点安装，再重启应用：
+**推荐：内置插件安装程序。** 打开「设置 → 内置插件」，粘贴包名，点安装，再重启应用：
 
 ```
-github:MCJF28/dsh-web-search-router
+dsh-web-search-router
 ```
 
-安装程序会自动把包写进 `dsh.profile.bundles`，不用手动改任何文件。
+安装程序会自动写进 `dsh.profile.bundles`，不用手改任何文件。
 
-习惯命令行的话：先完全退出应用，再在 profile 目录执行
+命令行方式（先完全退出应用）：
 
 ```bash
 cd ~/.dsh/profiles/desktop
-pnpm add github:MCJF28/dsh-web-search-router
+pnpm add dsh-web-search-router
 ```
 
 然后把包名加进 `dsh.profile.bundles`，重启应用。
@@ -108,22 +108,22 @@ Notices disappear after 12 seconds, and can also be dismissed manually.
 
 ## Install
 
-**The built-in plugin installer is the recommended way.** Open Settings → Built-in Plugins, paste the string below into the install box — it is exactly what follows `pnpm add` — then press install and restart the app:
+**The built-in plugin installer is the recommended way.** Open Settings → Built-in Plugins, paste the package name, press install, then restart the app:
 
 ```
-github:MCJF28/dsh-web-search-router
+dsh-web-search-router
 ```
 
-The installer writes the package into `dsh.profile.bundles` for you; no manual file edits.
+The installer writes the entry into `dsh.profile.bundles` for you; no manual file edits.
 
-Prefer the command line? Quit the app completely first, then from the profile directory:
+From the command line (quit the app completely first):
 
 ```bash
 cd ~/.dsh/profiles/desktop
-pnpm add github:MCJF28/dsh-web-search-router
+pnpm add dsh-web-search-router
 ```
 
-Add the package name to `dsh.profile.bundles` yourself and restart the app.
+Add the package name to `dsh.profile.bundles` and restart the app.
 
 
 ## Notes
